@@ -7,21 +7,23 @@ app=Flask(__name__)
 
 @app.route("/", methods=['GET'])
 def index():
-    return 'Hello World'
+    return 'Countries Application'
 
-@app.route("/countries", methods=['GET'])
-def get_countries():
+@app.route("/countries/<string:name>", methods=['GET'])
+def get_countries(name):
     try:
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=pse.RealDictCursor)
 
-        cur.execute("SELECT shortname from countries")
+        cur.execute("SELECT * from countries WHERE LOWER(shortname)= %s", [name])
 
         countries_data = cur.fetchall()
-        # countries = countries_data
         cur.close()
 
-        return countries_data, 200, {'Content-Type': 'application/json'}
+        if (len(countries_data)<1):
+            return 'No Country Found with such name', 404
+        else:
+            return countries_data, 200, {'Content-Type': 'application/json'}
 
     except:
         return 'Failed to fetch Data', 404
