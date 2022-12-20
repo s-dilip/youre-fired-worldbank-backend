@@ -1,6 +1,6 @@
 import json
 import psycopg2
-import psycopg2.extras  # We'll need this to convert SQL responses into dictionaries
+import psycopg2.extras as pse  # We'll need this to convert SQL responses into dictionaries
 from flask import Flask, current_app, request, jsonify
 
 app=Flask(__name__)
@@ -13,14 +13,15 @@ def index():
 def get_countries():
     try:
         conn = get_db_connection()
-        cur = conn.cursor()
+        cur = conn.cursor(cursor_factory=pse.RealDictCursor)
 
-        cur.execute("SELECT * from countries")
+        cur.execute("SELECT shortname from countries")
 
         countries_data = cur.fetchall()
+        # countries = countries_data
         cur.close()
 
-        return jsonify(countries_data), 200
+        return countries_data, 200, {'Content-Type': 'application/json'}
 
     except:
         return 'Failed to fetch Data', 404
