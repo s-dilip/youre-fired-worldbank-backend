@@ -64,6 +64,22 @@ def get_list_of_indicators():
     except:
         return 'Failed to fetch Data', 404
 
+@app.route("/countries/allnames", methods=['GET'])
+def get_list_of_country_shortnames():
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT shortname from countries")
+        countries = cur.fetchall()
+        cur.close()
+
+        return countries, 200
+
+    except:
+        return 'Failed to fetch Data', 404
+
 def get_db_connection():
     try:
         conn = psycopg2.connect("dbname=czreijar user=czreijar password=TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t host=kandula.db.elephantsql.com port=5432")
