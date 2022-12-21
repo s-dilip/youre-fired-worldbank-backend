@@ -30,6 +30,24 @@ def get_countries(name):
     except:
         return 'Failed to fetch Data', 404
 
+@app.route("/countries/<string:name>/<string:indicator>/<int:year>", methods=['GET'])
+def get_indicator_for_year(name, indicator, year):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=pse.RealDictCursor)
+
+        cur.execute("SELECT * from indicators WHERE LOWER(countryname)= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s", [name,indicator, year])
+
+        indicator_data = cur.fetchall()
+        cur.close()
+
+        if (len(indicator_data)<1):
+            return 'No Country Found with such name', 404
+        else:
+            return indicator_data, 200, {'Content-Type': 'application/json'}
+
+    except:
+        return 'Failed to fetch Data', 404
 
 def get_db_connection():
     try:
