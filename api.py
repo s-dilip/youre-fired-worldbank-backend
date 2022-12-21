@@ -72,23 +72,43 @@ def get_indicator_for_year(name, indicator, year):
         return 'Failed to fetch Data', 404
 
 
+@app.route("/countries", methods=["GET"])
+def search_countries():
+    result_name = request.args.get('name', type=str) 
+    result_indicator = request.args.get('indicator', type=str) 
+    result_year = request.args.get('year', type=str) 
+    name_params = result_name.split(',')
+    countries_of_name = []
+    for item in name_params:
+        param = [item,result_indicator,result_year]
+        query = "SELECT * from indicators WHERE LOWER(countryname)= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s"
+        data = db_select(query,(param))
+        countries_of_name.append(data)
+    if len(countries_of_name[0])>0:
+        return countries_of_name
+    else: 
+        return 'No Country Found with such name', 404
+
+
+
 
 
 @app.route("/countries", methods=["GET"])
 def search_country():
     result = request.args.get('name', type=str) 
     params = result.split(',')
-    stories_of_tag = []
+    countries_of_name = []
     print(params)
     for item in params:
         param = item
         query = "SELECT * from countries WHERE LOWER(shortname)= %s"
         data = db_select(query,(param,))
-        stories_of_tag.append(data)
-    if len(stories_of_tag[0])>0:
-        return stories_of_tag
+        countries_of_name.append(data)
+    if len(countries_of_name[0])>0:
+        return countries_of_name
     else: 
         return 'No Country Found with such name', 404
+
 
 
 
