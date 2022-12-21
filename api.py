@@ -1,11 +1,90 @@
-from flask import Flask, current_app, request
+import json
+import psycopg2
+import psycopg2.extras as pse  # We'll need this to convert SQL responses into dictionaries
+from flask import Flask, current_app, request, jsonify
+from flask_cors import CORS
 
 app=Flask(__name__)
+CORS(app)
 
 @app.route("/", methods=['GET'])
 def index():
-    return 'Hello World'
+    return 'Countries Application'
 
-@app.route("/draftpull", methods=['GET'])
-def index():
-    return 'Draft Pull Request'
+@app.route("/countries/<string:name>", methods=['GET'])
+def get_countries(name):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=pse.RealDictCursor)
+
+        cur.execute("SELECT * from countries WHERE LOWER(shortname)= %s", [name])
+
+        countries_data = cur.fetchall()
+        cur.close()
+
+        if (len(countries_data)<1):
+            return 'No Country Found with such name', 404
+        else:
+            return countries_data, 200, {'Content-Type': 'application/json'}
+
+    except:
+        return 'Failed to fetch Data', 404
+
+@app.route("/countries/<string:name>/<string:indicator>/<int:year>", methods=['GET'])
+def get_indicator_for_year(name, indicator, year):
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor(cursor_factory=pse.RealDictCursor)
+
+        cur.execute("SELECT * from indicators WHERE LOWER(countryname)= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s", [name,indicator, year])
+
+        indicator_data = cur.fetchall()
+        cur.close()
+
+        if (len(indicator_data)<1):
+            return 'No Country Found with such name', 404
+        else:
+            return indicator_data, 200, {'Content-Type': 'application/json'}
+
+    except:
+        return 'Failed to fetch Data', 404
+
+@app.route("/countries/indicators", methods=['GET'])
+def get_list_of_indicators():
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT DISTINCT indicatorname from indicators")
+        indicators = cur.fetchall()
+        cur.close()
+
+        return indicators, 200
+    except:
+        return 'Failed to fetch Data', 404
+
+@app.route("/countries/allnames", methods=['GET'])
+def get_list_of_country_shortnames():
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT shortname from countries")
+        countries = cur.fetchall()
+        cur.close()
+
+        return countries, 200
+
+    except:
+        return 'Failed to fetch Data', 404
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect("dbname=czreijar user=czreijar password=TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t host=kandula.db.elephantsql.com port=5432")
+        return conn
+    except:
+        print('Error Connecting to Database')
+
+    
