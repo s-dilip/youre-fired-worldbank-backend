@@ -49,6 +49,21 @@ def get_indicator_for_year(name, indicator, year):
     except:
         return 'Failed to fetch Data', 404
 
+@app.route("/countries/indicators", methods=['GET'])
+def get_list_of_indicators():
+
+    try:
+        conn = get_db_connection()
+        cur = conn.cursor()
+
+        cur.execute("SELECT DISTINCT indicatorname from indicators")
+        indicators = cur.fetchall()
+        cur.close()
+
+        return indicators, 200
+    except:
+        return 'Failed to fetch Data', 404
+
 def get_db_connection():
     try:
         conn = psycopg2.connect("dbname=czreijar user=czreijar password=TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t host=kandula.db.elephantsql.com port=5432")
