@@ -12,7 +12,7 @@ def get_db_connection():
 
 def select(query, params=()):
   try:
-    with conn.cursor(cursor_factory=pse.RealDictCursor) as cur:
+    with conn.cursor() as cur:
       cur.execute(query, params)
       data = cur.fetchall()
       return data
