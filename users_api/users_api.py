@@ -1,8 +1,7 @@
-from flask import Flask, current_app, request
+from flask import Flask, request
 from users_db_interactions import select, insert
 import bcrypt
 from flask import jsonify
-import json
 
 app = Flask(__name__)
 
