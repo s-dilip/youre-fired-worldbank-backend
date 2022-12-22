@@ -2,10 +2,32 @@ import json
 import psycopg2
 import psycopg2.extras as pse  # We'll need this to convert SQL responses into dictionaries
 from flask import Flask, current_app, request, jsonify
-from flask_cors import CORS
+# from flask_cors import CORS
 
 app=Flask(__name__)
-CORS(app)
+# CORS(app)
+
+def get_db_connection():
+    try:
+        conn = psycopg2.connect("dbname=czreijar user=czreijar password=TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t host=kandula.db.elephantsql.com port=5432")
+        return conn
+    except:
+        print('Error Connecting to Database')
+
+conn = get_db_connection()
+
+def db_select(query, parameters=()):
+    if conn != None:
+        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+            try:
+                print(parameters)
+                cur.execute(query, parameters)
+                data = cur.fetchall()
+                return data       
+            except:
+               return "Error executing query.", 404
+    else:
+        return "No connection"
 
 @app.route("/", methods=['GET'])
 def index():
@@ -49,6 +71,48 @@ def get_indicator_for_year(name, indicator, year):
     except:
         return 'Failed to fetch Data', 404
 
+
+@app.route("/countries", methods=["GET"])
+def search_countries():
+    result_name = request.args.get('name', type=str) 
+    result_indicator = request.args.get('indicator', type=str) 
+    result_year = request.args.get('year', type=str) 
+    name_params = result_name.split(',')
+    countries_of_name = []
+    for item in name_params:
+        param = [item,result_indicator,result_year]
+        query = "SELECT * from indicators WHERE LOWER(countryname)= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s"
+        data = db_select(query,(param))
+        countries_of_name.append(data)
+    if len(countries_of_name[0])>0:
+        return countries_of_name
+    else: 
+        return 'No Country Found with such name', 404
+        
+
+
+
+
+
+@app.route("/countries", methods=["GET"])
+def search_country():
+    result = request.args.get('name', type=str) 
+    params = result.split(',')
+    countries_of_name = []
+    print(params)
+    for item in params:
+        param = item
+        query = "SELECT * from countries WHERE LOWER(shortname)= %s"
+        data = db_select(query,(param,))
+        countries_of_name.append(data)
+    if len(countries_of_name[0])>0:
+        return countries_of_name
+    else: 
+        return 'No Country Found with such name', 404
+
+
+
+
 @app.route("/countries/indicators", methods=['GET'])
 def get_list_of_indicators():
 
@@ -63,6 +127,7 @@ def get_list_of_indicators():
         return indicators, 200
     except:
         return 'Failed to fetch Data', 404
+
 
 @app.route("/countries/allnames", methods=['GET'])
 def get_list_of_country_shortnames():
@@ -80,11 +145,6 @@ def get_list_of_country_shortnames():
     except:
         return 'Failed to fetch Data', 404
 
-def get_db_connection():
-    try:
-        conn = psycopg2.connect("dbname=czreijar user=czreijar password=TJ2StTuQIl2CoRoinQTwPxk8pBGfdf6t host=kandula.db.elephantsql.com port=5432")
-        return conn
-    except:
-        print('Error Connecting to Database')
+
 
     

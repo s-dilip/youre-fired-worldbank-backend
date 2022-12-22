@@ -9,23 +9,23 @@ def get_db_connection():
   except:
     print("Error connecting to database.")
 
-
 def select(query, params=()):
   try:
-    with conn.cursor() as cur:
+    conn = get_db_connection()
+    with conn.cursor(cursor_factory=pse.RealDictCursor) as cur:
       cur.execute(query, params)
       data = cur.fetchall()
-      return data
+      return jsonify(data)
   except:
     return "Error selecting data", 304
 
 def insert(query, params=()):
   try:
+    conn = get_db_connection()
     with conn.cursor() as cur:
       cur.execute(query, params)
       conn.commit()
-      return "Insert completed."
+    return "Insert completed.", 200
   except:
     return "Error inserting data", 304
 
-conn = get_db_connection()
