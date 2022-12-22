@@ -12,10 +12,11 @@ def get_db_connection():
 def select(query, params=()):
   try:
     conn = get_db_connection()
-    with conn.cursor(cursor_factory=pse.RealDictCursor) as cur:
+    with conn.cursor() as cur:
       cur.execute(query, params)
       data = cur.fetchall()
-      return jsonify(data)
+      print(data)
+      return data
   except:
     return "Error selecting data", 304
 
