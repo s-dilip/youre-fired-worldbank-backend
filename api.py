@@ -2,10 +2,10 @@ import json
 import psycopg2
 import psycopg2.extras as pse  # We'll need this to convert SQL responses into dictionaries
 from flask import Flask, current_app, request, jsonify
-# from flask_cors import CORS
+from flask_cors import CORS
 
 app=Flask(__name__)
-# CORS(app)
+CORS(app)
 
 def get_db_connection():
     try:
@@ -18,7 +18,7 @@ conn = get_db_connection()
 
 def db_select(query, parameters=()):
     if conn != None:
-        with conn.cursor(cursor_factory=psycopg2.extras.RealDictCursor) as cur:
+        with conn.cursor(cursor_factory=pse.RealDictCursor) as cur:
             try:
                 print(parameters)
                 cur.execute(query, parameters)
@@ -39,7 +39,7 @@ def get_countries(name):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=pse.RealDictCursor)
 
-        cur.execute("SELECT * from countries WHERE LOWER(shortname)= %s", [name])
+        cur.execute("SELECT * from countries WHERE shortname= %s", [name])
 
         countries_data = cur.fetchall()
         cur.close()
@@ -58,7 +58,7 @@ def get_indicator_for_year(name, indicator, year):
         conn = get_db_connection()
         cur = conn.cursor(cursor_factory=pse.RealDictCursor)
 
-        cur.execute("SELECT * from indicators WHERE LOWER(countryname)= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s", [name,indicator, year])
+        cur.execute("SELECT * from indicators WHERE countryname= %s AND LOWER(indicatorname)=LOWER(%s) AND year=%s", [name,indicator, year])
 
         indicator_data = cur.fetchall()
         cur.close()
