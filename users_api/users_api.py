@@ -1,5 +1,5 @@
 from flask import Flask, request
-from users_db_interactions import insert
+from users_db_interactions import select, insert
 import bcrypt
 from flask import jsonify
 from flask_cors import CORS
