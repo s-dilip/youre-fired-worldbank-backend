@@ -2,8 +2,11 @@ from flask import Flask, request
 from users_db_interactions import select, insert
 import bcrypt
 from flask import jsonify
+from flask_cors import CORS
 
 app = Flask(__name__)
+
+CORS(app)
 
 @app.route('/create-account', methods=['POST'])
 def set_username_and_password():
