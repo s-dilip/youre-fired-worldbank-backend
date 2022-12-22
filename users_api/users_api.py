@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, select, request
 from users_db_interactions import insert
 import bcrypt
 from flask import jsonify
