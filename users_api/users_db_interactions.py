@@ -4,7 +4,7 @@ from flask import jsonify
 
 def get_db_connection():
   try:
-    conn = psycopg2.connect("dbname=users user=louisglanfield host=localhost")
+    conn = psycopg2.connect("dbname=tixarvol user=tixarvol password=SM9EGRE2yI4d3x2L4ydJDiEU6ILyzZOG host=surus.db.elephantsql.com port=5432")
     return conn
   except:
     print("Error connecting to database.")
