@@ -1,4 +1,3 @@
-import json
 import psycopg2
 import psycopg2.extras as pse  # We'll need this to convert SQL responses into dictionaries
 from flask import Flask, current_app, request, jsonify
