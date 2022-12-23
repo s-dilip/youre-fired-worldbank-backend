@@ -6,7 +6,7 @@ from flask_cors import CORS
 
 app = Flask(__name__)
 
-CORS(app, origins='http://localhost:3000', supports_credentials=True, with_credentials=True)
+CORS(app, origins='https://63a5979d1e1ae564e7e314d2--astounding-yeot-8df369.netlify.app', supports_credentials=True, with_credentials=True)
 
 @app.route('/create-account', methods=['POST'])
 def set_username_and_password():
